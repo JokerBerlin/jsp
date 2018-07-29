@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import pe.dao.interfaces.usuariosDAO;
@@ -43,7 +44,7 @@ public class MySQLUsuario implements usuariosDAO{
     public void insertar(usuarios o) throws ExcepcionGeneral {
         try {
             conexion = new MySQLConexion().conectar();
-            sentencia = conexion.prepareStatement(INSERTAR);
+            sentencia = conexion.prepareStatement(INSERTAR, Statement.RETURN_GENERATED_KEYS);
             sentencia.setString(1, o.getUsuario());
             sentencia.setString(2, o.getClave());
             sentencia.setString(3, o.getCorreo());
@@ -51,14 +52,13 @@ public class MySQLUsuario implements usuariosDAO{
             //execute update = insert, update, delete
             //execute query = select
             
-            int r = sentencia.executeUpdate();
-            if(r == 0){
+            if(sentencia.executeUpdate() == 0){
                 throw new ExcepcionGeneral("No se inserto el registro");
             }
-            /*resultados = sentencia.getGeneratedKeys();
+            resultados = sentencia.getGeneratedKeys();
             if(resultados.next()){
                 o.setId_usuario(resultados.getInt(1));
-            }*/
+            }
         } catch (SQLException sqle) {
             throw new ExcepcionGeneral(sqle.getMessage());
         }
